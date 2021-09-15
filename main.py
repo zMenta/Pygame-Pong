@@ -9,11 +9,16 @@ def ball_animation():
 
     if ball.top <= 0 or ball.bottom >= screen_height:
         ball_speed_y *= -1
-    if ball.left <= 0 or ball.right >= screen_width:
-        ball_speed_x *= -1
 
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
+
+def ball_restart():
+    global ball_speed_x
+    if ball.left <= 0 or ball.right >= screen_width:
+        ball_speed_x *= -1
+        ball.x = SCREEN_MIDDLE[0]
+        ball.y = SCREEN_MIDDLE[1]
 
 def opponent_animation():
     if opponent.top <= 0:
@@ -48,10 +53,10 @@ def player_movement(event):
             player_speed += 9
 
 def opponent_ai():
-    if ball.x <= screen_width-300:
+    if ball.x <= screen_width-400:
         if opponent.top < ball.y:
             opponent.y  += paddle_speed
-        if opponent.bottom > ball.y:
+        if opponent.bottom - 15 > ball.y:
             opponent.y -= paddle_speed
 
 
@@ -76,7 +81,7 @@ opponent = pygame.Rect(40, SCREEN_MIDDLE[1] -70 ,10,140)
 ball_speed_x = 7
 ball_speed_y = 7
 
-paddle_speed = 10
+paddle_speed = 9
 player_speed = 0
 
 
@@ -92,15 +97,11 @@ while True:
         
 
     ball_animation()
+    ball_restart()
     player_animation()
     # Opponent
     opponent_animation()
     opponent_ai()
-
-
-    # Opponent Handling #
-
-    
 
     #Visual
     screen.fill(bg_color)
