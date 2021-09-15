@@ -9,16 +9,55 @@ def ball_animation():
 
     if ball.top <= 0 or ball.bottom >= screen_height:
         ball_speed_y *= -1
-    if ball.left <= 0 or ball.right >= screen_width:
-        ball_speed_x *= -1
 
     if ball.colliderect(player) or ball.colliderect(opponent):
         ball_speed_x *= -1
+
+def ball_restart():
+    global ball_speed_x
+    if ball.left <= 0 or ball.right >= screen_width:
+        ball_speed_x *= -1
+        ball.x = SCREEN_MIDDLE[0]
+        ball.y = SCREEN_MIDDLE[1]
+
+def opponent_animation():
+    if opponent.top <= 0:
+        opponent.top = 0
+    if opponent.bottom >= screen_height:
+        opponent.bottom = screen_height
+
+def player_animation():
+    player.y += player_speed
+
+    if player.top <= 0:
+        player.top = 0
+    if player.bottom >= screen_height:
+        player.bottom = screen_height
 
 def quit(event):
     if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+def player_movement(event):
+    global player_speed
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_DOWN:
+            player_speed += 9
+        if event.key == pygame.K_UP:
+            player_speed -= 9
+    if event.type == pygame.KEYUP:
+        if event.key == pygame.K_DOWN:
+            player_speed -= 9
+        if event.key == pygame.K_UP:
+            player_speed += 9
+
+def opponent_ai():
+    if ball.x <= screen_width-400:
+        if opponent.top < ball.y:
+            opponent.y  += paddle_speed
+        if opponent.bottom - 15 > ball.y:
+            opponent.y -= paddle_speed
 
 
 # General Setup
@@ -54,35 +93,15 @@ while True:
     # Input Handling
     for event in pygame.event.get():
         quit(event)
+        player_movement(event)
         
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                player_speed += 9
-            if event.key == pygame.K_UP:
-                player_speed -= 9
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
-                player_speed -= 9
-            if event.key == pygame.K_UP:
-                player_speed += 9
-
-
-    # if player.y >= 0 or player.y <= screen_height:
 
     ball_animation()
-    player.y += player_speed
-
-    if player.top <= 0:
-        player.top = 0
-    if player.bottom >= screen_height:
-        player.bottom = screen_height
-
-
-    # Opponent Handling #
-    opponent.y += paddle_speed
-
-    if opponent.top <= 0 or opponent.bottom >= screen_height:
-        paddle_speed *= -1
+    ball_restart()
+    player_animation()
+    # Opponent
+    opponent_animation()
+    opponent_ai()
 
     #Visual
     screen.fill(bg_color)
